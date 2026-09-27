@@ -229,7 +229,7 @@
 
       <a
         class="button gold"
-        href="https://strmfree.st/player/football/kansas-city-chiefs-vs-miami-dolphins"
+        href="https://streamfree.top/player/football/kansas-city-chiefs-vs-miami-dolphins"
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -255,6 +255,8 @@
         id="player"
         src="https://streamfree.top/embed/football/kansas-city-chiefs-vs-miami-dolphins"
         allow="fullscreen; picture-in-picture; autoplay"
+        sandbox="allow-scripts allow-fullscreen allow-presentation"
+        referrerpolicy="no-referrer"
         allowfullscreen
       ></iframe>
 
@@ -273,7 +275,13 @@
 <script>
 
   const kickoff =
-    new Date("2026-09-28T02:30:00+09:30");
+    new Date("2026-09-27T17:00:00Z");
+  const player =
+    document.getElementById("player");
+  const playerStreamSrc =
+    player.src;
+  let countdownInterval;
+  let isReloadingPlayer = false;
 
 
   function updateCountdown() {
@@ -299,6 +307,9 @@
       status.textContent =
         "If the stream has not started, hit RELOAD STREAM.";
 
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
       return;
     }
 
@@ -326,18 +337,19 @@
 
   function reloadPlayer() {
 
-    const player =
-      document.getElementById("player");
+    if (isReloadingPlayer) {
+      return;
+    }
 
-    const current =
-      player.src;
+    isReloadingPlayer = true;
 
     player.src = "about:blank";
 
 
     setTimeout(() => {
 
-      player.src = current;
+      player.src = playerStreamSrc;
+      isReloadingPlayer = false;
 
     }, 300);
 
@@ -371,10 +383,13 @@
 
   updateCountdown();
 
-  setInterval(
+  countdownInterval =
+    setInterval(
     updateCountdown,
     1000
   );
+
+  let lastAutoReloadAt = 0;
 
 
   /*
@@ -402,18 +417,18 @@
         while around game time.
       */
 
-      const seconds =
-        now.getSeconds();
-
-      if (seconds < 2) {
+      if (
+        now.getTime() - lastAutoReloadAt >= 120000
+      ) {
 
         reloadPlayer();
+        lastAutoReloadAt = now.getTime();
 
       }
 
     }
 
-  }, 1000);
+  }, 5000);
 
 </script>
 
