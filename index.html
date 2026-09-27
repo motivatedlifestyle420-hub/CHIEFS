@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+
+  <meta name="theme-color" content="#e31837" />
+
+  <title>Chiefs Watch</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #050505;
+      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    header {
+      background: #e31837;
+      padding:
+        calc(16px + env(safe-area-inset-top))
+        18px
+        16px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      font-size: 15px;
+    }
+
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 16px;
+    }
+
+    .card {
+      background: #161616;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .match {
+      text-align: center;
+    }
+
+    .match h2 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+
+    .kickoff {
+      color: #ffb81c;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    #countdown {
+      margin-top: 10px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .status {
+      margin-top: 10px;
+      color: #aaa;
+    }
+
+    .buttons {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button,
+    a.button {
+      width: 100%;
+      padding: 16px;
+      border: 0;
+      border-radius: 10px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+    }
+
+    .red {
+      background: #e31837;
+      color: white;
+    }
+
+    .gold {
+      background: #ffb81c;
+      color: #000;
+    }
+
+    .dark {
+      background: #333;
+      color: white;
+    }
+
+    .player-shell {
+      width: 100%;
+      background: black;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: 56.25vw;
+      max-height: 650px;
+      min-height: 300px;
+      border: 0;
+      background: #000;
+    }
+
+    .note {
+      margin-top: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #888;
+    }
+
+    @media (max-width: 600px) {
+      main {
+        padding: 10px;
+      }
+
+      iframe {
+        height: 58vh;
+        min-height: 360px;
+      }
+
+      .match h2 {
+        font-size: 22px;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 600px) {
+      header,
+      .match {
+        display: none;
+      }
+
+      main {
+        padding: 0;
+        max-width: none;
+      }
+
+      .card.player-card {
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+      }
+
+      .player-shell {
+        border-radius: 0;
+      }
+
+      iframe {
+        width: 100vw;
+        height: 100vh;
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🏈 CHIEFS WATCH</h1>
+  <p>Kansas City Chiefs</p>
+</header>
+
+<main>
+
+  <div class="card match">
+    <h2>Chiefs vs Dolphins</h2>
+
+    <div class="kickoff">
+      Kickoff: Monday 2:30 AM Adelaide
+    </div>
+
+    <div id="countdown">
+      Loading countdown...
+    </div>
+
+    <div id="status" class="status">
+      Stream may only become active shortly before kickoff.
+    </div>
+
+    <div class="buttons">
+
+      <button
+        class="red"
+        onclick="reloadPlayer()"
+      >
+        🔄 RELOAD STREAM
+      </button>
+
+      <a
+        class="button gold"
+        href="https://strmfree.st/player/football/kansas-city-chiefs-vs-miami-dolphins"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        ▶ OPEN DIRECT PLAYER
+      </a>
+
+      <button
+        class="dark"
+        onclick="goFullscreen()"
+      >
+        ⛶ FULL SCREEN
+      </button>
+
+    </div>
+  </div>
+
+
+  <div class="card player-card">
+
+    <div class="player-shell" id="playerShell">
+
+      <iframe
+        id="player"
+        src="https://streamfree.top/embed/football/kansas-city-chiefs-vs-miami-dolphins"
+        allow="fullscreen; picture-in-picture; autoplay"
+        allowfullscreen
+      ></iframe>
+
+    </div>
+
+    <div class="note">
+      If the embedded player does not load properly on your phone,
+      use OPEN DIRECT PLAYER above.
+    </div>
+
+  </div>
+
+</main>
+
+
+<script>
+
+  const kickoff =
+    new Date("2026-09-28T02:30:00+09:30");
+
+
+  function updateCountdown() {
+
+    const now = new Date();
+
+    const diff =
+      kickoff.getTime() - now.getTime();
+
+
+    const countdown =
+      document.getElementById("countdown");
+
+    const status =
+      document.getElementById("status");
+
+
+    if (diff <= 0) {
+
+      countdown.textContent =
+        "🔴 GAME TIME";
+
+      status.textContent =
+        "If the stream has not started, hit RELOAD STREAM.";
+
+      return;
+    }
+
+
+    const totalSeconds =
+      Math.floor(diff / 1000);
+
+    const hours =
+      Math.floor(totalSeconds / 3600);
+
+    const minutes =
+      Math.floor(
+        (totalSeconds % 3600) / 60
+      );
+
+    const seconds =
+      totalSeconds % 60;
+
+
+    countdown.textContent =
+      `${hours}h ${minutes}m ${seconds}s`;
+
+  }
+
+
+  function reloadPlayer() {
+
+    const player =
+      document.getElementById("player");
+
+    const current =
+      player.src;
+
+    player.src = "about:blank";
+
+
+    setTimeout(() => {
+
+      player.src = current;
+
+    }, 300);
+
+  }
+
+
+  function goFullscreen() {
+
+    const shell =
+      document.getElementById(
+        "playerShell"
+      );
+
+
+    if (shell.requestFullscreen) {
+
+      shell.requestFullscreen();
+
+    }
+
+    else if (
+      shell.webkitRequestFullscreen
+    ) {
+
+      shell.webkitRequestFullscreen();
+
+    }
+
+  }
+
+
+  updateCountdown();
+
+  setInterval(
+    updateCountdown,
+    1000
+  );
+
+
+  /*
+    Refresh the player automatically
+    shortly before kickoff.
+  */
+
+  setInterval(() => {
+
+    const now =
+      new Date();
+
+    const minutesToKickoff =
+      (kickoff.getTime() - now.getTime())
+      / 60000;
+
+
+    if (
+      minutesToKickoff <= 15 &&
+      minutesToKickoff >= -240
+    ) {
+
+      /*
+        Refresh once every 2 minutes
+        while around game time.
+      */
+
+      const seconds =
+        now.getSeconds();
+
+      if (seconds < 2) {
+
+        reloadPlayer();
+
+      }
+
+    }
+
+  }, 1000);
+
+</script>
+
+</body>
+</html>
